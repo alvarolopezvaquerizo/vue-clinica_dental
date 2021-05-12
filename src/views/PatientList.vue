@@ -44,38 +44,16 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
+          <tr v-for="patient in patients" :key="patient.id">
             <td>
               <img src="https://www.eltiempo.com/files/article_content/files/crop/uploads/2020/09/03/5f51bcadc5cf8.r_1599194976129.0-13-429-335.jpeg"> 
-              Mark
-              <p><i class="far fa-calendar-alt"></i> 10/01/2019</p>
+              {{ patient.datos_paciente.nombre }} {{ patient.datos_paciente.apellidos }}
+              <!--<p><i class="far fa-calendar-alt"></i> 10/01/2019</p>-->
             </td>
-            <td>Otto</td>
-            <td>@mdo</td>
-            <td>Otto</td>
-            <td>Otto</td>
-          </tr>
-          <tr>
-            <td>
-              <img src="https://www.eltiempo.com/files/article_content/files/crop/uploads/2020/09/03/5f51bcadc5cf8.r_1599194976129.0-13-429-335.jpeg"> 
-              Mark
-              <p><i class="far fa-calendar-alt"></i> 10/01/2019</p>
-            </td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td>Otto</td>
-            <td>Otto</td>
-          </tr>
-          <tr>
-            <td>
-              <img src="https://www.eltiempo.com/files/article_content/files/crop/uploads/2020/09/03/5f51bcadc5cf8.r_1599194976129.0-13-429-335.jpeg"> 
-              Mark
-              <p><i class="far fa-calendar-alt"></i> 10/01/2019</p>
-            </td>
-            <td>Thornton</td>
-            <td>@fat</td>
-            <td>Otto</td>
-            <td>Otto</td>
+            <td>{{ patient.ficha_dental.clinica }}</td>
+            <td>{{ patient.ficha_dental.objetivo_tratamiento }}</td>
+            <td>{{ patient.ficha_dental.estado }}</td>
+            <td></td>
           </tr>
         </tbody>
       </table>
@@ -107,7 +85,28 @@
 
 
 <script>
-
+import axios from 'axios';
+export default {
+  data() {
+    return {
+      patients: null
+    }
+  },
+  mounted() {
+    this.getPatients();
+  },
+  methods: {
+    getPatients() {
+      axios
+          .get('api.json')
+              .then( response => {
+                console.log(response)
+                this.patients = response.data
+              })
+              .catch( e => console.log(e) )
+    }
+  }
+}
 </script>
 
 
