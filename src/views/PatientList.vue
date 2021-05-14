@@ -16,7 +16,7 @@
     </div>
 
     <div class="search col-6">
-      <input type="text" class="form-control" placeholder="Buscar...">
+      <input type="text" class="form-control" placeholder="Buscar..." v-model="search" @keyup="searchPatients">
     </div>
 
     <div class="buttons col-12">
@@ -44,34 +44,57 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="patient in patients" :key="patient.id">
+          <tr v-for="patient in filterPatients" :key="patient.id">
             <td>
               <img src="https://www.eltiempo.com/files/article_content/files/crop/uploads/2020/09/03/5f51bcadc5cf8.r_1599194976129.0-13-429-335.jpeg"> 
               {{ patient.datos_paciente.nombre }} {{ patient.datos_paciente.apellidos }}
-              <!--<p><i class="far fa-calendar-alt"></i> 10/01/2019</p>-->
+              <p><i class="far fa-calendar-alt"></i> {{ patient.datos_paciente.fecha_nacimiento }}</p>
             </td>
             <td>{{ patient.ficha_dental.clinica }}</td>
             <td>{{ patient.ficha_dental.objetivo_tratamiento }}</td>
             <td>{{ patient.ficha_dental.estado }}</td>
-            <td></td>
+            <td>
+              <select class="form-select">
+                <option selected>Acciones</option>
+                <option value="1">Editar</option>
+                <option value="2">Finalizar</option>
+                <option value="3">Borrar</option>
+              </select>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
+    <!--CARDS-->
+    <div class="card m-3" style="width: 21rem; height: 24rem;" v-for="patient in filterPatients" :key="patient.id">
+      <img src="https://www.eltiempo.com/files/article_content/files/crop/uploads/2020/09/03/5f51bcadc5cf8.r_1599194976129.0-13-429-335.jpeg" class="image-card card-img-top mx-auto">
+      <div class="card-body text-center">
+        <h5 class="card-title">{{ patient.datos_paciente.nombre }} {{ patient.datos_paciente.apellidos }}</h5>
+        <p class="card-text">{{ patient.datos_paciente.fecha_nacimiento }}</p>
+        <p class="card-text"><strong>Clinica:</strong> {{ patient.ficha_dental.clinica }}</p>
+        <p class="card-text"><strong>Tratamiento:</strong> {{ patient.ficha_dental.objetivo_tratamiento }}</p>
+        <p class="card-text"><strong>Estado:</strong> {{ patient.ficha_dental.estado }}</p>
+      </div>
+      <div class="card-footer mx-auto">
+        <a href="#" class="btn btn-success me-3">Editar</a>
+        <a href="#" class="btn btn-warning me-3">Finalizar</a>
+        <a href="#" class="btn btn-danger me-3">Borrar</a>
+      </div>
+    </div>
+
+    <!--PAGINATION-->
     <div class="pagination">
       <nav aria-label="Page navigation">
         <ul class="pagination">
           <li class="page-item">
-            <a class="page-link" href="#" aria-label="Previous">
+            <a class="page-link" aria-label="Previous">
               <span aria-hidden="true">&laquo;</span>
             </a>
           </li>
-          <li class="page-item"><a class="page-link" href="#">1</a></li>
-          <li class="page-item"><a class="page-link" href="#">2</a></li>
-          <li class="page-item"><a class="page-link" href="#">3</a></li>
+          <li class="page-item"><a class="page-link">1</a></li>
           <li class="page-item">
-            <a class="page-link" href="#" aria-label="Next">
+            <a class="page-link" aria-label="Next">
               <span aria-hidden="true">&raquo;</span>
             </a>
           </li>
@@ -89,21 +112,44 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      patients: null
+      patients: [],
+      search: '',
+      filterPatients: []
     }
   },
-  mounted() {
+
+  created() {
     this.getPatients();
   },
+  
   methods: {
+    // GET LIST PATIENTS
     getPatients() {
       axios
-          .get('api.json')
-              .then( response => {
-                console.log(response)
-                this.patients = response.data
-              })
-              .catch( e => console.log(e) )
+        .get('api.json')
+        .then( res => {
+          Object.values(res.data).forEach(element => {
+            this.patients.push(element);
+            this.filterPatients.push(element);
+          })
+          console.log(this.patients)
+        })
+        .catch( err => {
+          console.log(err)
+        });
+    },
+    // SEARCH PATIENTS
+    searchPatients() {
+      if(!this.search) {
+        this.filterPatients = this.patients;
+      }
+
+      const filter_patients = this.patients.filter((patient) => {
+        const name = patient.datos_paciente.nombre + ' ' + patient.datos_paciente.apellidos
+          return name.toLowerCase().includes(this.search.toLowerCase().trim());
+      });
+
+      this.filterPatients = filter_patients;
     }
   }
 }
@@ -168,7 +214,6 @@ img {
 }
 .table tbody p {
   color: #acacac;
-  position: fixed;
   margin-left: 55px;
   margin-top: -30px;
 }
@@ -181,5 +226,12 @@ img {
 }
 .pagination li:hover {
   color: #0d6efd;
+}
+/*CARD*/
+.image-card {
+  margin-top: 10px;
+  height: 100px;
+  width: 100px;
+  border-radius: 33%;
 }
 </style>

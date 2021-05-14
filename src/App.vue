@@ -7,7 +7,7 @@
     <div class="container-fluid">
       <div class="row">
 
-        <div class="col-2">
+        <div class="col-2 p-0">
           <Panel></Panel>
         </div>
 
