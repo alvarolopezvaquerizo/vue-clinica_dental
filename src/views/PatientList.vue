@@ -1,9 +1,11 @@
 <template>
   <div class="row">
+
     <!--HEADBOARD-->
     <div class="headboard col-12 p-3">
       <h5>Listado de Pacientes</h5>
     </div>
+
     <!--HEADER-->
     <div class="header col-6">
       <div class="icon-card">
@@ -20,19 +22,22 @@
     </div>
 
     <div class="buttons col-12">
-      <button type="button" class="btn btn-outline-primary me-4"><i class="fas fa-plus"></i> Nuevo Paciente</button>
+      <button v-b-modal.modal-center type="button" class="btn btn-outline-primary me-4"><i class="fas fa-plus"></i> Nuevo Paciente</button>
+      <NewPatient></NewPatient>
       <button type="button" class="btn btn-outline-primary"><i class="fas fa-file-download"></i> Descargar CSV</button>
     </div>
+
     <!--BUTTONS TABLE-->
     <div class="viewing col-12">
-      <button class="bg-transparent border-0"><i class="fas fa-bars"></i></button>
-      <button class="bg-transparent border-0"><i class="fas fa-table"></i></button>
+      <button class="bg-transparent border-0" v-on:click="viewTable" v-bind:class="viewMode === true ? 'gray' : ''"><i class="fas fa-bars"></i></button>
+      <button class="bg-transparent border-0" v-on:click="viewCard" v-bind:class="viewMode === true ? '' : 'gray'"><i class="fas fa-table"></i></button>
       <button class="bg-transparent border-0">5</button>
       <button class="bg-transparent border-0">10</button>
       <button class="bg-transparent border-0">15</button>
     </div>
+    
     <!--TABLE-->
-    <div class="table col-12 mt-3">
+    <div class="table col-12 mt-3" v-if="viewMode">
       <table class="table">
         <thead>
           <tr>
@@ -67,7 +72,7 @@
     </div>
 
     <!--CARDS-->
-    <div class="card m-3" style="width: 21rem; height: 24rem;" v-for="patient in filterPatients" :key="patient.id">
+    <div class="card m-3" style="width: 21rem; height: 24rem;" v-for="patient in filterPatients" :key="patient.id" v-else>
       <img src="https://www.eltiempo.com/files/article_content/files/crop/uploads/2020/09/03/5f51bcadc5cf8.r_1599194976129.0-13-429-335.jpeg" class="image-card card-img-top mx-auto">
       <div class="card-body text-center">
         <h5 class="card-title">{{ patient.datos_paciente.nombre }} {{ patient.datos_paciente.apellidos }}</h5>
@@ -109,12 +114,19 @@
 
 <script>
 import axios from 'axios';
+import NewPatient from '@/components/NewPatient';
+
 export default {
+  components: {
+    NewPatient
+  },
+
   data() {
     return {
       patients: [],
       search: '',
-      filterPatients: []
+      filterPatients: [],
+      viewMode: true
     }
   },
 
@@ -150,6 +162,14 @@ export default {
       });
 
       this.filterPatients = filter_patients;
+    },
+    // VIEW MODE TABLE
+    viewTable() {
+      this.viewMode = true;
+    },
+    // VIEW MODE CARD
+    viewCard() {
+      this.viewMode = false;
     }
   }
 }
@@ -195,10 +215,6 @@ export default {
   font-size: 30px;
   margin-right: 10px;
 }
-.viewing button:hover {
-  transform: scale(2);
-  transition: transform 1s ease-in-out 0s;
-}
 /*TABLE*/
 img {
   height: 50px;
@@ -217,6 +233,13 @@ img {
   margin-left: 55px;
   margin-top: -30px;
 }
+/*CARD*/
+.image-card {
+  margin-top: 10px;
+  height: 100px;
+  width: 100px;
+  border-radius: 33%;
+}
 /*PAGINATION*/
 .pagination {
   justify-content: center;
@@ -227,11 +250,7 @@ img {
 .pagination li:hover {
   color: #0d6efd;
 }
-/*CARD*/
-.image-card {
-  margin-top: 10px;
-  height: 100px;
-  width: 100px;
-  border-radius: 33%;
+.gray {
+  color: #868585;
 }
 </style>
