@@ -15,5 +15,7 @@ npm run serve
 npm run build
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+### Estimated time per task
+1. Create the Patient List view: 48 Hours
+2. New Patient: 2 Hours
+3. Patient file: 0 Hours
