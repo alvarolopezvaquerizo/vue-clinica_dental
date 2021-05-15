@@ -31,9 +31,9 @@
     <div class="viewing col-12">
       <button class="bg-transparent border-0" v-on:click="viewTable" v-bind:class="viewMode === true ? 'gray' : ''"><i class="fas fa-bars"></i></button>
       <button class="bg-transparent border-0" v-on:click="viewCard" v-bind:class="viewMode === true ? '' : 'gray'"><i class="fas fa-table"></i></button>
-      <button class="bg-transparent border-0">5</button>
-      <button class="bg-transparent border-0">10</button>
-      <button class="bg-transparent border-0">15</button>
+      <button class="bg-transparent border-0" v-on:click="itemsPage(5, false)" v-bind:class="selectItem === false ? 'gray' : ''">5</button>
+      <button class="bg-transparent border-0" v-on:click="itemsPage(10, true)" v-bind:class="selectItem === true ? 'gray' : ''">10</button>
+      <button class="bg-transparent border-0" v-on:click="itemsPage(15)" v-bind:class="selectItem === false ? '' : 'gray'">15</button>
     </div>
     
     <!--TABLE-->
@@ -114,6 +114,7 @@ export default {
       search: '',
       filterPatients: [],
       viewMode: true,
+      selectItem: false,
       actualPage: 1,
       itemsPerPage: 5
     }
@@ -133,7 +134,7 @@ export default {
             this.patients.push(element);
             this.filterPatients.push(element);
           })
-          console.log(this.patients)
+          //console.log(this.patients)
         })
         .catch( err => {
           console.log(err)
@@ -166,8 +167,12 @@ export default {
       const finalIndex = indexHome + this.itemsPerPage > items.length ? items.length : indexHome  + this.itemsPerPage;
       
       return items.slice(indexHome , finalIndex );
+    },
+    // ITEMS PER PAGE (5, 10, 15)
+    itemsPage(items, select) {
+      this.itemsPerPage = items;
+      this.selectItem = select;
     }
-    // 
   }
 }
 </script>
