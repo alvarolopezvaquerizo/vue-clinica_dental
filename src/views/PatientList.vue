@@ -27,7 +27,7 @@
       <button type="button" class="btn btn-outline-primary"><i class="fas fa-file-download"></i> Descargar CSV</button>
     </div>
 
-    <!--BUTTONS TABLE-->
+    <!--BUTTONS VIEWING-->
     <div class="viewing col-12">
       <button class="bg-transparent border-0" v-on:click="viewTable" v-bind:class="viewMode === true ? 'gray' : ''"><i class="fas fa-bars"></i></button>
       <button class="bg-transparent border-0" v-on:click="viewCard" v-bind:class="viewMode === true ? '' : 'gray'"><i class="fas fa-table"></i></button>
@@ -38,7 +38,7 @@
     
     <!--TABLE-->
     <div class="table col-12 mt-3" v-if="viewMode">
-      <table class="table">
+      <table class="table table-hover">
         <thead>
           <tr>
             <td>Nombre y apellidos</td>
@@ -49,7 +49,7 @@
           </tr>
         </thead>
         <tbody>
-          <tr v-for="patient in filterPatients" :key="patient.id">
+          <tr v-for="patient in pagination(filterPatients)" v-bind:key="patient.id">
             <td>
               <img src="https://www.eltiempo.com/files/article_content/files/crop/uploads/2020/09/03/5f51bcadc5cf8.r_1599194976129.0-13-429-335.jpeg"> 
               {{ patient.datos_paciente.nombre }} {{ patient.datos_paciente.apellidos }}
@@ -72,7 +72,7 @@
     </div>
 
     <!--CARDS-->
-    <div class="card m-3" style="width: 21rem; height: 24rem;" v-for="patient in filterPatients" :key="patient.id" v-else>
+    <div class="card m-3" style="width: 21rem; height: 24rem;" v-for="patient in pagination(filterPatients)" v-bind:key="patient.id" v-else>
       <img src="https://www.eltiempo.com/files/article_content/files/crop/uploads/2020/09/03/5f51bcadc5cf8.r_1599194976129.0-13-429-335.jpeg" class="image-card card-img-top mx-auto">
       <div class="card-body text-center">
         <h5 class="card-title">{{ patient.datos_paciente.nombre }} {{ patient.datos_paciente.apellidos }}</h5>
@@ -82,30 +82,14 @@
         <p class="card-text"><strong>Estado:</strong> {{ patient.ficha_dental.estado }}</p>
       </div>
       <div class="card-footer mx-auto">
-        <a href="#" class="btn btn-success me-3">Editar</a>
-        <a href="#" class="btn btn-warning me-3">Finalizar</a>
-        <a href="#" class="btn btn-danger me-3">Borrar</a>
+        <a class="btn btn-success me-3">Editar</a>
+        <a class="btn btn-warning me-3">Finalizar</a>
+        <a class="btn btn-danger me-3">Borrar</a>
       </div>
     </div>
 
     <!--PAGINATION-->
-    <div class="pagination">
-      <nav aria-label="Page navigation">
-        <ul class="pagination">
-          <li class="page-item">
-            <a class="page-link" aria-label="Previous">
-              <span aria-hidden="true">&laquo;</span>
-            </a>
-          </li>
-          <li class="page-item"><a class="page-link">1</a></li>
-          <li class="page-item">
-            <a class="page-link" aria-label="Next">
-              <span aria-hidden="true">&raquo;</span>
-            </a>
-          </li>
-        </ul>
-      </nav>
-    </div>
+    <b-pagination align="center" :total-rows="this.filterPatients.length " v-model="actualPage" :per-page="itemsPerPage" ></b-pagination>
 
   </div>
 </template>
@@ -114,11 +98,14 @@
 
 <script>
 import axios from 'axios';
+
 import NewPatient from '@/components/NewPatient';
+import ViewPatient from '@/components/ViewPatient';
 
 export default {
   components: {
-    NewPatient
+    NewPatient,
+    ViewPatient
   },
 
   data() {
@@ -126,7 +113,9 @@ export default {
       patients: [],
       search: '',
       filterPatients: [],
-      viewMode: true
+      viewMode: true,
+      actualPage: 1,
+      itemsPerPage: 5
     }
   },
 
@@ -170,7 +159,15 @@ export default {
     // VIEW MODE CARD
     viewCard() {
       this.viewMode = false;
+    },
+    // PAGING BAR
+    pagination(items) {
+      const indexHome = (this.actualPage - 1) * this.itemsPerPage;
+      const finalIndex = indexHome + this.itemsPerPage > items.length ? items.length : indexHome  + this.itemsPerPage;
+      
+      return items.slice(indexHome , finalIndex );
     }
+    // 
   }
 }
 </script>
@@ -227,6 +224,7 @@ img {
 .table tbody tr {
   border: 2px solid #ededed;
   line-height: 45px;
+  cursor: pointer;
 }
 .table tbody p {
   color: #acacac;
@@ -239,16 +237,6 @@ img {
   height: 100px;
   width: 100px;
   border-radius: 33%;
-}
-/*PAGINATION*/
-.pagination {
-  justify-content: center;
-}
-.pagination a {
-  color: #acacac;
-}
-.pagination li:hover {
-  color: #0d6efd;
 }
 .gray {
   color: #868585;
